@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dev Panel — MHP3rd Mix Set Guide</title>
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="dev-body">
+
+    <div class="dev-container">
+
+        <!-- HEADER -->
+        <header class="dev-header">
+            <h1>🛠️ Developer Panel</h1>
+            <p>MHP3rd Mix Set Guide — CRUD Data + Contributors + Team</p>
+        </header>
+
+        <!-- LOGIN SCREEN -->
+        <div class="dev-login" id="devLogin">
+            <h2>🔐 Login</h2>
+            <input type="password" id="passwordInput" placeholder="Masukkan password..." maxlength="20">
+            <button class="btn btn-gold" onclick="login()" style="width:100%;padding:12px;">Masuk</button>
+            <p style="margin-top:1rem;font-size:0.75rem;color:var(--text-muted);">
+                <a href="index.html" style="color:var(--text-muted);">← Kembali ke Landing Page</a>
+            </p>
+        </div>
+
+        <!-- MAIN PANEL -->
+        <div class="dev-panel" id="devPanel">
+
+            <!-- TOOLBAR -->
+            <div class="dev-toolbar">
+                <select id="weaponSelect" onchange="onWeaponChange()">
+                    <option value="">Pilih Weapon...</option>
+                </select>
+                <button class="btn btn-green" onclick="openAddModal()">+ Tambah Set</button>
+                <button class="btn btn-outline" onclick="exportData()">📥 Export JSON</button>
+                <button class="btn btn-outline" onclick="document.getElementById('importFile').click()">📤 Import JSON</button>
+                <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importData(event)">
+                <button class="btn-logout" onclick="logout()">Logout</button>
+            </div>
+
+            <!-- TABLE -->
+            <div class="dev-table-wrap">
+                <table class="dev-table">
+                    <thead>
+                        <tr>
+                            <th>Nama Set</th>
+                            <th>Rank</th>
+                            <th>Pieces</th>
+                            <th>Skills</th>
+                            <th>Gambar</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="mixsetTableBody">
+                        <tr>
+                            <td colspan="6" style="text-align:center;color:var(--text-muted);padding:3rem;">
+                                Pilih weapon untuk melihat data.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- CONTRIBUTOR EDITOR -->
+            <div class="contributor-editor">
+                <h3>🏆 Edit Top 5 Contributors</h3>
+                <p style="text-align:center;color:var(--text-muted);margin-bottom:1.5rem;font-size:0.85rem;">
+                    Isi nama, total donasi, dan link social media. Kosongkan jika tidak ada.
+                </p>
+                <div id="contributorEditCards">
+                    <!-- Diisi JavaScript -->
+                </div>
+                <div style="text-align:center;margin-top:1rem;">
+                    <button class="btn btn-green" onclick="saveContributors()">💾 Simpan Contributors</button>
+                </div>
+            </div>
+
+            <!-- TEAM EDITOR -->
+            <div class="team-editor">
+                <h3>👥 Edit Our Team</h3>
+                <p class="team-editor-subtitle">
+                    Isi profile tim pembuat website. Kosongkan jika tidak ada.
+                </p>
+                <div id="teamEditCards">
+                    <!-- Diisi JavaScript -->
+                </div>
+                <div style="text-align:center;margin-top:1rem;">
+                    <button class="btn btn-green" onclick="saveTeam()">💾 Simpan Team</button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- FOOTER -->
+        <footer class="footer">
+            <p>Created by <strong>Zeet</strong> · Support by <strong>Fairus</strong></p>
+        </footer>
+
+    </div>
+
+    <!-- ========== MODAL FORM ========== -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-form" id="modalForm">
+            <h2 id="modalTitle">Tambah Mix Set</h2>
+
+            <input type="hidden" id="editSetId">
+            <input type="hidden" id="editWeaponId">
+
+            <div class="form-row">
+                <div>
+                    <label>Nama Set</label>
+                    <input type="text" id="inputName" placeholder="Contoh: Jaggi Set">
+                </div>
+                <div>
+                    <label>Rank</label>
+                    <select id="inputRank">
+                        <option value="low">Low Rank</option>
+                        <option value="high">High Rank</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- PIECES -->
+            <label>🛡️ Armor Pieces</label>
+            <div id="piecesList"></div>
+            <button class="add-item-btn" onclick="addListItem('pieces')">+ Tambah Piece</button>
+
+            <!-- SKILLS -->
+            <label>⚡ Skills</label>
+            <div id="skillsList"></div>
+            <button class="add-item-btn" onclick="addListItem('skills')">+ Tambah Skill</button>
+
+            <!-- KELEBIHAN -->
+            <label>✅ Kelebihan</label>
+            <div id="kelebihanList"></div>
+            <button class="add-item-btn" onclick="addListItem('kelebihan')">+ Tambah Kelebihan</button>
+
+            <!-- KEKURANGAN -->
+            <label>❌ Kekurangan</label>
+            <div id="kekuranganList"></div>
+            <button class="add-item-btn" onclick="addListItem('kekurangan')">+ Tambah Kekurangan</button>
+
+            <!-- NOTES -->
+            <label>📝 Catatan</label>
+            <div id="notesList"></div>
+            <button class="add-item-btn" onclick="addListItem('notes')">+ Tambah Catatan</button>
+
+            <!-- IMAGES -->
+            <label>🖼️ Gambar (Upload via File Picker)</label>
+            <div class="current-images" id="currentImages"></div>
+            <input type="file" id="imageFileInput" accept="image/*" multiple style="display:none;" onchange="handleImageUpload(event)">
+            <button type="button" class="btn btn-blue btn-sm" onclick="document.getElementById('imageFileInput').click()">📷 Pilih Gambar</button>
+            <small style="display:block;color:var(--text-muted);margin-top:4px;">
+                Gambar dikonversi ke Base64 dan disimpan di Firestore. Maks 5MB per file.
+            </small>
+
+            <!-- ACTIONS -->
+            <div class="modal-actions">
+                <button class="btn btn-green" onclick="saveMixSet()">💾 Simpan</button>
+                <button class="btn btn-red" id="btnDeleteSet" style="display:none;" onclick="deleteMixSet()">🗑️ Hapus Set</button>
+                <button class="btn btn-outline" onclick="closeModal()">Batal</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div id="devToastContainer"></div>
+
+
+    <!-- ========== JAVASCRIPT ========== -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+        import {
+            getFirestore,
+            collection,
+            doc,
+            getDoc,
+            getDocs,
+            setDoc,
+            addDoc,
+            updateDoc,
+            deleteDoc,
+            query,
+            where,
+            orderBy,
+            serverTimestamp
+        } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+
+        // ===== FIREBASE CONFIG =====
+        const firebaseConfig = {
+            apiKey: "AIzaSyDG9ySIMBkUsVHXRC7M5WoMoRxMB3BuaZ0",
+            authDomain: "mh3rd-fdd53.firebaseapp.com",
+            projectId: "mh3rd-fdd53",
+            storageBucket: "mh3rd-fdd53.firebasestorage.app",
+            messagingSenderId: "212751426267",
+            appId: "1:212751426267:web:c263934dfb500c50dae2fe"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // ===== DEV PASSWORD =====
+        const DEV_PASSWORD = '12345678';
+
+        // ===== WEAPONS =====
+        const WEAPONS = [
+            { id: 'greatsword', name: 'Great Sword', icon: '🗡️' },
+            { id: 'longsword', name: 'Long Sword', icon: '⚔️' },
+            { id: 'swordshield', name: 'Sword & Shield', icon: '🛡️' },
+            { id: 'dualblades', name: 'Dual Blades', icon: '🔪' },
+            { id: 'hammer', name: 'Hammer', icon: '🔨' },
+            { id: 'huntinghorn', name: 'Hunting Horn', icon: '🎵' },
+            { id: 'lance', name: 'Lance', icon: '🔱' },
+            { id: 'gunlance', name: 'Gunlance', icon: '💥' },
+            { id: 'switchaxe', name: 'Switch Axe', icon: '🪓' },
+            { id: 'lightbowgun', name: 'Light Bowgun', icon: '🔫' },
+            { id: 'heavybowgun', name: 'Heavy Bowgun', icon: '💣' },
+            { id: 'bow', name: 'Bow', icon: '🏹' }
+        ];
+
+        // ===== STATE =====
+        let currentWeaponId = null;
+        let tempImages = [];
+
+        // ===== GLOBAL FUNCTIONS =====
+        window.login = login;
+        window.logout = logout;
+        window.onWeaponChange = onWeaponChange;
+        window.openAddModal = openAddModal;
+        window.openEditModal = openEditModal;
+        window.closeModal = closeModal;
+        window.addListItem = addListItem;
+        window.removeListItem = removeListItem;
+        window.removeTempImage = removeTempImage;
+        window.handleImageUpload = handleImageUpload;
+        window.saveMixSet = saveMixSet;
+        window.deleteMixSet = deleteMixSet;
+        window.confirmDelete = confirmDelete;
+        window.exportData = exportData;
+        window.importData = importData;
+        window.saveContributors = saveContributors;
+        window.saveTeam = saveTeam;
+
+        // ===== INIT =====
+        document.addEventListener('DOMContentLoaded', () => {
+            if (sessionStorage.getItem('devLoggedIn') === 'true') {
+                showPanel();
+            }
+
+            const weaponSelect = document.getElementById('weaponSelect');
+            WEAPONS.forEach(w => {
+                const opt = document.createElement('option');
+                opt.value = w.id;
+                opt.textContent = `${w.icon} ${w.name}`;
+                weaponSelect.appendChild(opt);
+            });
+
+            document.getElementById('modalOverlay').addEventListener('click', function(e) {
+                if (e.target === this) closeModal();
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') closeModal();
+            });
+
+            document.getElementById('passwordInput').addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') login();
+            });
+        });
+
+        // ===== LOGIN / LOGOUT =====
+        function login() {
+            const password = document.getElementById('passwordInput').value;
+            if (password === DEV_PASSWORD) {
+                sessionStorage.setItem('devLoggedIn', 'true');
+                showPanel();
+                showToast('✅ Login berhasil!');
+            } else {
+                showToast('❌ Password salah!');
+                document.getElementById('passwordInput').value = '';
+                document.getElementById('passwordInput').focus();
+            }
+        }
+
+        function logout() {
+            sessionStorage.removeItem('devLoggedIn');
+            document.getElementById('devLogin').style.display = 'block';
+            document.getElementById('devPanel').classList.remove('active');
+            document.getElementById('passwordInput').value = '';
+            currentWeaponId = null;
+            showToast('👋 Logout berhasil.');
+        }
+
+        function showPanel() {
+            document.getElementById('devLogin').style.display = 'none';
+            document.getElementById('devPanel').classList.add('active');
+            loadContributors();
+            loadTeam();
+        }
+
+        // ===== WEAPON CHANGE =====
+        function onWeaponChange() {
+            currentWeaponId = document.getElementById('weaponSelect').value;
+            if (currentWeaponId) {
+                loadMixSets();
+            } else {
+                document.getElementById('mixsetTableBody').innerHTML = `
+                    <tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:3rem;">
+                        Pilih weapon untuk melihat data.
+                    </td></tr>`;
+            }
+        }
+
+        // ===== LOAD MIX SETS =====
+        async function loadMixSets() {
+            if (!currentWeaponId) return;
+            const tbody = document.getElementById('mixsetTableBody');
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:2rem;">⏳ Memuat...</td></tr>';
+
+            try {
+                const mixsetsRef = collection(db, 'weapons', currentWeaponId, 'mixsets');
+                const snapshot = await getDocs(query(mixsetsRef, orderBy('rank')));
+
+                if (snapshot.empty) {
+                    tbody.innerHTML = `
+                        <tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:3rem;">
+                            Belum ada mix set.<br>
+                            <button class="btn btn-green btn-sm" style="margin-top:1rem;" onclick="openAddModal()">+ Tambah Set</button>
+                        </td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = '';
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    const rankLabel = data.rank === 'high' ?
+                        '<span class="rank-badge rank-high">HIGH</span>' :
+                        '<span class="rank-badge rank-low">LOW</span>';
+                    const piecesCount = (data.pieces || []).length;
+                    const skillsCount = (data.skills || []).length;
+                    const imagesCount = (data.images || []).length;
+
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td><strong>${escapeHTML(data.name)}</strong></td>
+                        <td>${rankLabel}</td>
+                        <td>${piecesCount} piece</td>
+                        <td>${skillsCount} skill</td>
+                        <td>${imagesCount} gambar</td>
+                        <td class="actions">
+                            <button class="btn btn-gold btn-sm" onclick="openEditModal('${docSnap.id}')">✏️ Edit</button>
+                            <button class="btn btn-red btn-sm" onclick="confirmDelete('${docSnap.id}', '${escapeHTML(data.name)}')">🗑️</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (error) {
+                console.error('Error loading:', error);
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--accent-red);padding:2rem;">Gagal memuat data.</td></tr>';
+                showToast('❌ Gagal memuat data.');
+            }
+        }
+
+        // ===== OPEN ADD MODAL =====
+        function openAddModal() {
+            if (!currentWeaponId) {
+                showToast('⚠️ Pilih weapon dulu!');
+                return;
+            }
+            document.getElementById('modalTitle').textContent = 'Tambah Mix Set';
+            document.getElementById('editSetId').value = '';
+            document.getElementById('editWeaponId').value = currentWeaponId;
+            document.getElementById('inputName').value = '';
+            document.getElementById('inputRank').value = 'low';
+            document.getElementById('btnDeleteSet').style.display = 'none';
+            tempImages = [];
+            renderListEditors([], [], [], [], []);
+            renderCurrentImages();
+            document.getElementById('modalOverlay').classList.add('active');
+        }
+
+        // ===== OPEN EDIT MODAL =====
+        async function openEditModal(setId) {
+            if (!currentWeaponId) return;
+
+            try {
+                const docRef = doc(db, 'weapons', currentWeaponId, 'mixsets', setId);
+                const docSnap = await getDoc(docRef);
+                if (!docSnap.exists()) {
+                    showToast('❌ Data tidak ditemukan.');
+                    return;
+                }
+
+                const data = docSnap.data();
+                document.getElementById('modalTitle').textContent = 'Edit Mix Set';
+                document.getElementById('editSetId').value = setId;
+                document.getElementById('editWeaponId').value = currentWeaponId;
+                document.getElementById('inputName').value = data.name || '';
+                document.getElementById('inputRank').value = data.rank || 'low';
+                document.getElementById('btnDeleteSet').style.display = 'inline-block';
+
+                tempImages = [...(data.images || [])];
+                renderListEditors(
+                    data.pieces || [],
+                    data.skills || [],
+                    data.kelebihan || [],
+                    data.kekurangan || [],
+                    data.notes || []
+                );
+                renderCurrentImages();
+                document.getElementById('modalOverlay').classList.add('active');
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('❌ Gagal membuka data.');
+            }
+        }
+
+        // ===== CLOSE MODAL =====
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('active');
+            tempImages = [];
+        }
+
+        // ===== LIST EDITORS =====
+        function renderListEditors(pieces, skills, kelebihan, kekurangan, notes) {
+            renderSingleList('piecesList', pieces, 'pieces');
+            renderSingleList('skillsList', skills, 'skills');
+            renderSingleList('kelebihanList', kelebihan, 'kelebihan');
+            renderSingleList('kekuranganList', kekurangan, 'kekurangan');
+            renderSingleList('notesList', notes, 'notes');
+        }
+
+        function renderSingleList(containerId, items, type) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            items.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'list-editor';
+                div.innerHTML = `
+                    <input type="text" value="${escapeHTML(item)}" data-type="${type}" data-index="${index}">
+                    <button onclick="removeListItem('${type}', ${index})">✕</button>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function addListItem(type) {
+            const containerId = type + 'List';
+            const container = document.getElementById(containerId);
+            const index = container.children.length;
+            const div = document.createElement('div');
+            div.className = 'list-editor';
+            div.innerHTML = `
+                <input type="text" placeholder="Isi ${type}..." data-type="${type}" data-index="${index}">
+                <button onclick="removeListItem('${type}', ${index})">✕</button>
+            `;
+            container.appendChild(div);
+        }
+
+        function removeListItem(type, index) {
+            const containerId = type + 'List';
+            const container = document.getElementById(containerId);
+            const editors = container.querySelectorAll('.list-editor');
+            if (editors[index]) {
+                editors[index].remove();
+            }
+            reindexList(type);
+        }
+
+        function reindexList(type) {
+            const containerId = type + 'List';
+            const container = document.getElementById(containerId);
+            const buttons = container.querySelectorAll('button');
+            buttons.forEach((btn, i) => {
+                btn.setAttribute('onclick', `removeListItem('${type}', ${i})`);
+            });
+        }
+
+        function getListValues(type) {
+            const containerId = type + 'List';
+            const container = document.getElementById(containerId);
+            const inputs = container.querySelectorAll('input');
+            const values = [];
+            inputs.forEach(input => {
+                const val = input.value.trim();
+                if (val) values.push(val);
+            });
+            return values;
+        }
+
+        // ===== IMAGE HANDLING =====
+        function renderCurrentImages() {
+            const container = document.getElementById('currentImages');
+            container.innerHTML = '';
+            tempImages.forEach((img, index) => {
+                const div = document.createElement('div');
+                div.className = 'img-wrap';
+                div.innerHTML = `
+                    <img src="${img}" alt="Preview">
+                    <button class="remove-img" onclick="removeTempImage(${index})">✕</button>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function removeTempImage(index) {
+            tempImages.splice(index, 1);
+            renderCurrentImages();
+        }
+
+        function handleImageUpload(event) {
+            const files = event.target.files;
+            if (!files || files.length === 0) return;
+
+            let loaded = 0;
+            const total = files.length;
+
+            Array.from(files).forEach(file => {
+                if (file.size > 5 * 1024 * 1024) {
+                    showToast(`⚠️ ${file.name} terlalu besar (maks 5MB)`);
+                    loaded++;
+                    if (loaded === total) event.target.value = '';
+                    return;
+                }
+
+                if (!file.type.startsWith('image/')) {
+                    showToast(`⚠️ ${file.name} bukan file gambar`);
+                    loaded++;
+                    if (loaded === total) event.target.value = '';
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    tempImages.push(e.target.result);
+                    renderCurrentImages();
+                    loaded++;
+                    if (loaded === total) {
+                        event.target.value = '';
+                        showToast(`✅ ${total} gambar berhasil ditambahkan!`);
+                    }
+                };
+                reader.onerror = function() {
+                    showToast(`❌ Gagal membaca ${file.name}`);
+                    loaded++;
+                    if (loaded === total) event.target.value = '';
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // ===== SAVE MIX SET =====
+        async function saveMixSet() {
+            const setId = document.getElementById('editSetId').value;
+            const weaponId = document.getElementById('editWeaponId').value;
+            const name = document.getElementById('inputName').value.trim();
+            const rank = document.getElementById('inputRank').value;
+
+            if (!name) {
+                showToast('⚠️ Nama set wajib diisi!');
+                return;
+            }
+            if (!weaponId) {
+                showToast('⚠️ Pilih weapon dulu!');
+                return;
+            }
+
+            const data = {
+                name: name,
+                rank: rank,
+                pieces: getListValues('pieces'),
+                skills: getListValues('skills'),
+                kelebihan: getListValues('kelebihan'),
+                kekurangan: getListValues('kekurangan'),
+                notes: getListValues('notes'),
+                images: [...tempImages],
+                updatedAt: serverTimestamp()
+            };
+
+            const dataSize = new Blob([JSON.stringify(data)]).size;
+            if (dataSize > 900000) {
+                showToast('⚠️ Data terlalu besar (maks ~900KB).');
+                return;
+            }
+
+            try {
+                if (setId) {
+                    const docRef = doc(db, 'weapons', weaponId, 'mixsets', setId);
+                    const existingSnap = await getDoc(docRef);
+                    const existingData = existingSnap.data() || {};
+                    data.rating = existingData.rating || 0;
+                    data.ratingCount = existingData.ratingCount || 0;
+                    data.comments = existingData.comments || [];
+
+                    await updateDoc(docRef, data);
+                    showToast('✅ Mix set berhasil diupdate!');
+                } else {
+                    data.createdAt = serverTimestamp();
+                    data.rating = 0;
+                    data.ratingCount = 0;
+                    data.comments = [];
+                    const collRef = collection(db, 'weapons', weaponId, 'mixsets');
+                    await addDoc(collRef, data);
+                    showToast('✅ Mix set berhasil ditambahkan!');
+                }
+                closeModal();
+                loadMixSets();
+            } catch (error) {
+                console.error('Error saving:', error);
+                showToast('❌ Gagal menyimpan data. ' + error.message);
+            }
+        }
+
+        // ===== DELETE =====
+        function deleteMixSet() {
+            const setId = document.getElementById('editSetId').value;
+            const weaponId = document.getElementById('editWeaponId').value;
+            if (!setId || !weaponId) return;
+
+            if (confirm('Yakin ingin menghapus mix set ini?')) {
+                const docRef = doc(db, 'weapons', weaponId, 'mixsets', setId);
+                deleteDoc(docRef)
+                    .then(() => {
+                        showToast('🗑️ Mix set berhasil dihapus.');
+                        closeModal();
+                        loadMixSets();
+                    })
+                    .catch(error => {
+                        console.error('Error deleting:', error);
+                        showToast('❌ Gagal menghapus.');
+                    });
+            }
+        }
+
+        function confirmDelete(setId, name) {
+            if (confirm(`Yakin ingin menghapus "${name}"?`)) {
+                const docRef = doc(db, 'weapons', currentWeaponId, 'mixsets', setId);
+                deleteDoc(docRef)
+                    .then(() => {
+                        showToast('🗑️ Berhasil dihapus.');
+                        loadMixSets();
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showToast('❌ Gagal menghapus.');
+                    });
+            }
+        }
+
+        // ===== CONTRIBUTORS =====
+        async function loadContributors() {
+            try {
+                const docRef = doc(db, 'settings', 'topContributors');
+                const docSnap = await getDoc(docRef);
+                let contributors = [];
+
+                if (docSnap.exists()) {
+                    contributors = docSnap.data().contributors || [];
+                }
+
+                const slots = [];
+                for (let i = 0; i < 5; i++) {
+                    slots.push(contributors[i] || { name: '', amount: '', tiktok: '', facebook: '', youtube: '' });
+                }
+
+                const container = document.getElementById('contributorEditCards');
+                container.innerHTML = slots.map((c, i) => `
+                    <div class="contributor-edit-card">
+                        <h4>🏅 Contributor #${i + 1}</h4>
+                        <div class="contributor-edit-row">
+                            <input type="text" placeholder="Nama" value="${escapeHTML(c.name)}" data-contributor-index="${i}" data-field="name">
+                            <input type="text" placeholder="Total Donasi (contoh: Rp 500.000)" value="${escapeHTML(c.amount)}" data-contributor-index="${i}" data-field="amount">
+                        </div>
+                        <div class="contributor-edit-row">
+                            <input type="text" placeholder="Link TikTok" value="${escapeHTML(c.tiktok)}" data-contributor-index="${i}" data-field="tiktok">
+                            <input type="text" placeholder="Link Facebook" value="${escapeHTML(c.facebook)}" data-contributor-index="${i}" data-field="facebook">
+                        </div>
+                        <div class="contributor-edit-row">
+                            <input type="text" placeholder="Link YouTube" value="${escapeHTML(c.youtube)}" data-contributor-index="${i}" data-field="youtube">
+                        </div>
+                    </div>
+                `).join('');
+
+            } catch (error) {
+                console.error('Error loading contributors:', error);
+            }
+        }
+
+        async function saveContributors() {
+            const contributors = [];
+            for (let i = 0; i < 5; i++) {
+                const nameInput = document.querySelector(`input[data-contributor-index="${i}"][data-field="name"]`);
+                const amountInput = document.querySelector(`input[data-contributor-index="${i}"][data-field="amount"]`);
+                const tiktokInput = document.querySelector(`input[data-contributor-index="${i}"][data-field="tiktok"]`);
+                const facebookInput = document.querySelector(`input[data-contributor-index="${i}"][data-field="facebook"]`);
+                const youtubeInput = document.querySelector(`input[data-contributor-index="${i}"][data-field="youtube"]`);
+
+                const name = nameInput ? nameInput.value.trim() : '';
+                const amount = amountInput ? amountInput.value.trim() : '';
+                const tiktok = tiktokInput ? tiktokInput.value.trim() : '';
+                const facebook = facebookInput ? facebookInput.value.trim() : '';
+                const youtube = youtubeInput ? youtubeInput.value.trim() : '';
+
+                if (name) {
+                    contributors.push({ name, amount, tiktok, facebook, youtube });
+                } else {
+                    contributors.push({ name: '', amount: '', tiktok: '', facebook: '', youtube: '' });
+                }
+            }
+
+            try {
+                const docRef = doc(db, 'settings', 'topContributors');
+                await setDoc(docRef, {
+                    contributors: contributors,
+                    updatedAt: serverTimestamp()
+                });
+                showToast('✅ Contributors berhasil disimpan!');
+            } catch (error) {
+                console.error('Error saving contributors:', error);
+                showToast('❌ Gagal menyimpan contributors.');
+            }
+        }
+
+        // ===== TEAM =====
+        async function loadTeam() {
+            try {
+                const docRef = doc(db, 'settings', 'teamMembers');
+                const docSnap = await getDoc(docRef);
+                let members = [];
+
+                if (docSnap.exists()) {
+                    members = docSnap.data().members || [];
+                }
+
+                const slots = [];
+                for (let i = 0; i < 5; i++) {
+                    slots.push(members[i] || { name: '', nickMH: '', tiktok: '', youtube: '' });
+                }
+
+                const container = document.getElementById('teamEditCards');
+                container.innerHTML = slots.map((m, i) => `
+                    <div class="team-edit-card">
+                        <h4>👤 Member #${i + 1}</h4>
+                        <div class="team-edit-row">
+                            <input type="text" placeholder="Nama Lengkap" value="${escapeHTML(m.name)}" data-team-index="${i}" data-field="name">
+                            <input type="text" placeholder="Nick ID Game MH3rd" value="${escapeHTML(m.nickMH)}" data-team-index="${i}" data-field="nickMH">
+                        </div>
+                        <div class="team-edit-row">
+                            <input type="text" placeholder="Link TikTok" value="${escapeHTML(m.tiktok)}" data-team-index="${i}" data-field="tiktok">
+                            <input type="text" placeholder="Link YouTube" value="${escapeHTML(m.youtube)}" data-team-index="${i}" data-field="youtube">
+                        </div>
+                    </div>
+                `).join('');
+
+            } catch (error) {
+                console.error('Error loading team:', error);
+            }
+        }
+
+        async function saveTeam() {
+            const members = [];
+            for (let i = 0; i < 5; i++) {
+                const nameInput = document.querySelector(`input[data-team-index="${i}"][data-field="name"]`);
+                const nickInput = document.querySelector(`input[data-team-index="${i}"][data-field="nickMH"]`);
+                const tiktokInput = document.querySelector(`input[data-team-index="${i}"][data-field="tiktok"]`);
+                const youtubeInput = document.querySelector(`input[data-team-index="${i}"][data-field="youtube"]`);
+
+                const name = nameInput ? nameInput.value.trim() : '';
+                const nickMH = nickInput ? nickInput.value.trim() : '';
+                const tiktok = tiktokInput ? tiktokInput.value.trim() : '';
+                const youtube = youtubeInput ? youtubeInput.value.trim() : '';
+
+                if (name) {
+                    members.push({ name, nickMH, tiktok, youtube });
+                } else {
+                    members.push({ name: '', nickMH: '', tiktok: '', youtube: '' });
+                }
+            }
+
+            try {
+                const docRef = doc(db, 'settings', 'teamMembers');
+                await setDoc(docRef, {
+                    members: members,
+                    updatedAt: serverTimestamp()
+                });
+                showToast('✅ Team berhasil disimpan!');
+            } catch (error) {
+                console.error('Error saving team:', error);
+                showToast('❌ Gagal menyimpan team.');
+            }
+        }
+
+        // ===== EXPORT =====
+        async function exportData() {
+            try {
+                const data = {};
+                for (const weapon of WEAPONS) {
+                    const mixsetsRef = collection(db, 'weapons', weapon.id, 'mixsets');
+                    const lowSnap = await getDocs(query(mixsetsRef, where('rank', '==', 'low')));
+                    const highSnap = await getDocs(query(mixsetsRef, where('rank', '==', 'high')));
+
+                    data[weapon.id] = { low: [], high: [] };
+                    lowSnap.forEach(d => data[weapon.id].low.push({ id: d.id, ...d.data() }));
+                    highSnap.forEach(d => data[weapon.id].high.push({ id: d.id, ...d.data() }));
+                }
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'mhp3rd-mixset-backup.json';
+                a.click();
+                URL.revokeObjectURL(url);
+                showToast('📥 Data berhasil diexport!');
+            } catch (error) {
+                console.error('Export error:', error);
+                showToast('❌ Gagal export.');
+            }
+        }
+
+        // ===== IMPORT =====
+        async function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (!confirm('⚠️ Import akan MENIMPA SEMUA data. Lanjutkan?')) {
+                event.target.value = '';
+                return;
+            }
+
+            try {
+                const text = await file.text();
+                const data = JSON.parse(text);
+                let total = 0;
+
+                for (const [weaponId, sets] of Object.entries(data)) {
+                    const collRef = collection(db, 'weapons', weaponId, 'mixsets');
+                    const oldDocs = await getDocs(collRef);
+                    const deletePromises = oldDocs.docs.map(d =>
+                        deleteDoc(doc(db, 'weapons', weaponId, 'mixsets', d.id))
+                    );
+                    await Promise.all(deletePromises);
+
+                    for (const set of (sets.low || [])) {
+                        const { id, ...setData } = set;
+                        setData.rank = 'low';
+                        setData.rating = setData.rating || 0;
+                        setData.ratingCount = setData.ratingCount || 0;
+                        setData.comments = setData.comments || [];
+                        await addDoc(collRef, setData);
+                        total++;
+                    }
+
+                    for (const set of (sets.high || [])) {
+                        const { id, ...setData } = set;
+                        setData.rank = 'high';
+                        setData.rating = setData.rating || 0;
+                        setData.ratingCount = setData.ratingCount || 0;
+                        setData.comments = setData.comments || [];
+                        await addDoc(collRef, setData);
+                        total++;
+                    }
+                }
+
+                showToast(`✅ ${total} mix set berhasil diimport!`);
+                if (currentWeaponId) loadMixSets();
+            } catch (error) {
+                console.error('Import error:', error);
+                showToast('❌ Gagal import.');
+            }
+
+            event.target.value = '';
+        }
+
+        // ===== TOAST =====
+        function showToast(message, duration = 3500) {
+            const container = document.getElementById('devToastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'dev-toast';
+            toast.textContent = message;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                toast.style.transition = 'all 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, duration);
+        }
+
+        // ===== HELPER =====
+        function escapeHTML(str) {
+            if (!str) return '';
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        console.log('🛠️ Dev Panel MHP3rd Mix Set Guide - Ready');
+        console.log('📋 Password: 12345678');
+        console.log('🏆 Contributors + Social Links | 👥 Team Editor Ready');
+    </script>
+
+</body>
+</html>

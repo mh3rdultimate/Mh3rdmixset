@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MHP3rd Mix Set Guide</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar" id="navbar">
+        <div class="navbar-inner">
+            <a href="#" class="navbar-logo">
+                <span class="navbar-logo-icon">⚔</span>
+                MHP3rd Mix Set
+            </a>
+            <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">☰</button>
+            <ul class="navbar-links" id="navLinks">
+                <li><a href="#weapon-nav">Weapons</a></li>
+                <li><a href="#contributors">Contributors</a></li>
+                <li><a href="#team">Our Team</a></li>
+                <li><a href="dev.html" class="btn-dev">Dev Mode</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hero-content">
+            <span class="hero-badge animate-fade-in">Monster Hunter Portable 3rd</span>
+            <h1>
+                Ultimate Mix Set Guide
+                <span class="subtitle">12 Weapons · Low & High Rank</span>
+            </h1>
+            <p>
+                Temukan kombinasi armor terbaik untuk setiap tipe senjata. Dari Great Sword hingga Bow, 
+                kami hadirkan rekomendasi mix set lengkap dengan kelebihan, kekurangan, dan catatan penting.
+            </p>
+            
+            <!-- SEARCH BAR -->
+            <div class="hero-search animate-fade-in">
+                <div class="search-container">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="heroSearchInput" placeholder="Cari nama mix set..." autocomplete="off">
+                    <div class="search-loading" id="heroSearchLoading">
+                        <span class="loader"></span>
+                    </div>
+                </div>
+                <div class="search-results" id="heroSearchResults"></div>
+            </div>
+
+            <div class="hero-cta animate-fade-in">
+                <a href="#weapon-nav" class="btn-primary">Jelajahi Set</a>
+                <a href="dev.html" class="btn-secondary">Dev Mode</a>
+            </div>
+        </div>
+        
+        <!-- Floating particles -->
+        <div class="particles">
+            <span class="particle" style="top:10%;left:5%;animation-delay:0s;">⚔️</span>
+            <span class="particle" style="top:20%;right:10%;animation-delay:2s;">🛡️</span>
+            <span class="particle" style="bottom:30%;left:15%;animation-delay:4s;">🗡️</span>
+            <span class="particle" style="top:50%;right:5%;animation-delay:1s;">🔱</span>
+            <span class="particle" style="bottom:15%;right:20%;animation-delay:3s;">🏹</span>
+        </div>
+    </section>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+        <!-- GLOBAL FILTER -->
+        <section class="global-filter-section" id="weapon-nav">
+            <h2 class="section-title">Pilih Senjatamu</h2>
+            <p class="section-subtitle">Klik senjata untuk melihat rekomendasi mix set</p>
+            
+            <div class="global-filter-tabs">
+                <button class="filter-tab active" data-filter="all" onclick="setGlobalFilter('all')">
+                    🛡️ All Sets
+                </button>
+                <button class="filter-tab" data-filter="low" onclick="setGlobalFilter('low')">
+                    <span class="rank-badge rank-low">LOW</span> Low Rank Only
+                </button>
+                <button class="filter-tab" data-filter="high" onclick="setGlobalFilter('high')">
+                    <span class="rank-badge rank-high">HIGH</span> High Rank Only
+                </button>
+            </div>
+
+            <div class="weapon-nav-grid" id="weaponNavGrid">
+                <!-- Diisi oleh JavaScript -->
+            </div>
+        </section>
+
+        <!-- WEAPON SECTIONS -->
+        <div id="weaponSections"></div>
+
+        <!-- TOP CONTRIBUTORS -->
+        <section class="contributors-section" id="contributors">
+            <h2 class="section-title">🏆 Top Contributors</h2>
+            <p class="section-subtitle">Terima kasih kepada para hunter yang telah mendukung guide ini</p>
+            <div class="contributors-grid" id="contributorsGrid">
+                <!-- Diisi oleh JavaScript -->
+            </div>
+        </section>
+
+        <!-- OUR TEAM -->
+        <section class="team-section" id="team">
+            <h2 class="section-title">👥 Our Team</h2>
+            <p class="section-subtitle">Para hunter di balik pembuatan website ini</p>
+            <div class="team-grid" id="teamGrid">
+                <!-- Diisi oleh JavaScript -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- IMAGE MODAL -->
+    <div class="image-modal" id="imageModal">
+        <img src="" alt="Preview" id="imageModalImg">
+    </div>
+
+    <!-- TOAST -->
+    <div id="toastContainer"></div>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <p>Monster Hunter Portable 3rd &copy; CAPCOM.</p>
+        <p>Created by <strong>Zeet</strong> · Support by <strong>Fairus</strong></p>
+        <p style="margin-top:0.5rem;"><a href="dev.html">Dev Mode</a></p>
+    </footer>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>
